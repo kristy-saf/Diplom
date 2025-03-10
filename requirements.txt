@@ -3,3 +3,4 @@ scipy
 streamlit
 pandas
 matplotlib
+openpyxl
