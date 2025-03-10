@@ -51,7 +51,7 @@ if a_list!=[]:
     a_s_1 = {'Номер':[i+1 for i in range (number)], 'Реальное значение': a_list[:number],
              'Прогнозируемое значение':[x_1[0]+x_1[1]*(i+1) for i in range (number)], 'Разница':[abs(x_1[0]+x_1[1]*(i+1)-a_list[:number][i]) for i in range (number)]}
     a_df_1 = pd.DataFrame(a_s_1)
-    st.write('Реальные и прогнозные значения для первой части')
+    st.write('Реальные и прогнозные значения для первой части:')
     a_1 = st.data_editor(a_df_1, disabled=['Номер', 'Реальное значение', 'Прогнозируемое значение', 'Разница'], hide_index=True, column_config = {
                                         "Реальное значение": st.column_config.TextColumn(),
                                         "Прогнозируемое значение": st.column_config.TextColumn(),
@@ -59,7 +59,7 @@ if a_list!=[]:
     a_s_2 = {'Номер':[i+1 for i in range (number-1, n)], 'Реальное значение': a_list[number-1:],
              'Прогнозируемое значение':[x_2[0]+x_2[1]*(i+1) for i in range (number-1, n)], 'Разница':[abs(x_2[0]+x_2[1]*(i+1)-a_list[number-1:][i-number+1]) for i in range (number-1, n)]}
     a_df_2 = pd.DataFrame(a_s_2)
-    st.write('Реальные и прогнозные значения для второй части')
+    st.write('Реальные и прогнозные значения для второй части:')
     a_2 = st.data_editor(a_df_2, disabled=['Номер', 'Реальное значение', 'Прогнозируемое значение', 'Разница'], hide_index=True, column_config = {
                                         "Реальное значение": st.column_config.TextColumn(),
                                         "Прогнозируемое значение": st.column_config.TextColumn(),
