@@ -2,6 +2,14 @@ import numpy as np
 from scipy.optimize import minimize
 import streamlit as st
 import pandas as pd
+
+def r2 (mas_progn, mas_real):
+    SSE = sum([(mas_progn[i]-mas_real[i])**2 for i in range (len(mas_real))])
+    mean = sum(mas_real)/len(mas_real)
+    SST = sum([(mas_progn[i]-mean)**2 for i in range (len(mas_real))])
+    return 1 - (SSE/SST)
+
+
 on = st.toggle("Ввести данные в файле?")
 a_list=[]
 if on:
@@ -11,7 +19,7 @@ if on:
         a_list = df['y_t'].tolist()
         n = len(a_list)
 else:
-    n = st.number_input(label = 'Введите количество данных: ', min_value = 1)
+    n = st.number_input(label = 'Введите количество данных: ', min_value = 5)
     a_s = {'Номер':[i+1 for i in range (n)], 'Значение':[None for i in range (n)]}
     a_df = pd.DataFrame(a_s)
     a = st.data_editor(a_df, column_config = {
@@ -25,7 +33,24 @@ else:
     else:
         st.warning('Заполните все поля ввода значений')
 if a_list!=[]:
-    number = st.number_input(label = 'Введите ограничивающий номер: ', min_value = 1, max_value=n, value = n // 2)
+    def f_cheb(x):  #необходимо "собрать" функцию, которую будем минимизировать, аргументом которой будет только структура портфеля x
+        mas = []
+        for i in range (len(a_list)):
+            mas.append(abs(x[0]+x[1]*(i+1)-a_list[i]))
+        return max(mas)
+    x_start = np.array([0, 0]) #x_start представляет собой начальное предположение точки минимума
+    result_cheb = minimize(f_cheb, x_start, method = 'SLSQP')
+    x_cheb = result_cheb.x.tolist()
+    change = [abs(x_cheb[0]+x_cheb[1]*(i+1)-a_list[i]) for i in range (len(a_list))]
+    #st.write(change)
+    max_val = 0
+    max_k = 0
+    for i in range (1, len(change)-3):
+        if change[i] > max_val:
+            max_val = change[i]
+            max_k = i
+    max_k+=1
+    number = st.number_input(label = 'Введите ограничивающий номер: ', min_value = 3, max_value=n-2, value = max_k)
     a_1=a_list[:number-1]
     a_2=a_list[number:]
     def const(x):
@@ -63,11 +88,15 @@ if a_list!=[]:
     result_2_cheb = minimize(f_2_cheb, x_start, method = 'SLSQP', constraints=constarnt)
     x_2_cheb = result_2_cheb.x.tolist() #запись значений вектора x = (x_1, x_2, ...)
     st.write('Полученные значения для первой части:')
-    st.write('                                     по МНК:        а_0=', x_1_mnk[0], ', а_1=', x_1_mnk[1])
-    st.write('                                     по Чебышеву:   а_0=', x_1_cheb[0], ', а_1=', x_1_cheb[1])
+    st.write('по МНК:        а_0 =', x_1_mnk[0], ', а_1 =', x_1_mnk[1])
+    st.write('уравнение: y_t =', x_1_mnk[0], '+', x_1_mnk[1], '*t')
+    st.write('по Чебышеву:   а_0 =', x_1_cheb[0], ', а_1 =', x_1_cheb[1])
+    st.write('уравнение: y_t =', x_1_cheb[0], '+', x_1_cheb[1], '*t')
     st.write('Полученные значения для второй части:')
-    st.write('                                     по МНК:        а_0=', x_2_mnk[0], ', а_1=', x_2_mnk[1])
-    st.write('                                     по Чебышеву:   а_0=', x_2_cheb[0], ', а_1=', x_2_cheb[1])
+    st.write('по МНК:        а_0 =', x_2_mnk[0], ', а_1 =', x_2_mnk[1])
+    st.write('уравнение: y_t =', x_2_mnk[0], '+', x_2_mnk[1], '*t')
+    st.write('по Чебышеву:   а_0 =', x_2_cheb[0], ', а_1 =', x_2_cheb[1])
+    st.write('уравнение: y_t =', x_2_cheb[0], '+', x_2_cheb[1], '*t')
     a_s_1 = {'Номер':[i+1 for i in range (number)], 'Реальное значение': a_list[:number],
              'Прогноз по МНК':[x_1_mnk[0]+x_1_mnk[1]*(i+1) for i in range (number)],
              'Разница по МНК':[abs(x_1_mnk[0]+x_1_mnk[1]*(i+1)-a_list[:number][i]) for i in range (number)],
@@ -100,7 +129,11 @@ if a_list!=[]:
                                         "Разница по МНК": st.column_config.TextColumn(),
                                         "Разница по Чебышеву": st.column_config.TextColumn(),
                                         })
+    a_df_2.drop(0, inplace=True)
     df_res = pd.concat([a_df_1, a_df_2])
+    st.write('Значения R^2:')
+    st.write('             для МНК: ', r2(df_res["Прогноз по МНК"].tolist(), df_res["Реальное значение"].tolist()))
+    st.write('             для Чебышева: ', r2(df_res["Прогноз по Чебышеву"].tolist(), df_res["Реальное значение"].tolist()))
     st.write('График прогнозируемых и реальных значений')
     st.scatter_chart(df_res[['Номер',"Реальное значение", "Прогноз по МНК", "Прогноз по Чебышеву"]], x = 'Номер' )
     st.write('График погрешностей между прогнозируемыми и реальными значениями')
