@@ -3,6 +3,8 @@ from scipy.optimize import minimize
 import streamlit as st
 import pandas as pd
 
+st.set_page_config(layout="wide")
+
 def r2 (mas_progn, mas_real):
     SSE = sum([(mas_progn[i]-mas_real[i])**2 for i in range (len(mas_real))])
     mean = sum(mas_real)/len(mas_real)
