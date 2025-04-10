@@ -3,23 +3,11 @@ from scipy.optimize import minimize
 import streamlit as st
 import pandas as pd
 
-st.markdown(
-    """
-    <style>
-    [data-testid="stAppViewContainer"] > .main {
-        background-color: #FFFFFF;  /* Белый фон */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 def r2 (mas_progn, mas_real):
     SSE = sum([(mas_progn[i]-mas_real[i])**2 for i in range (len(mas_real))])
     mean = sum(mas_real)/len(mas_real)
     SST = sum([(mas_progn[i]-mean)**2 for i in range (len(mas_real))])
     return 1 - (SSE/SST)
-
 
 on = st.toggle("Ввести данные в файле?")
 a_list=[]
