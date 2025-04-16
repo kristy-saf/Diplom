@@ -86,7 +86,7 @@ if a_list!=[]:
     #st.write(change)
     max_val = 0
     max_k = 0
-    for i in range (1, len(change)-3):
+    for i in range (2, len(change)-2):
         if change[i] > max_val:
             max_val = change[i]
             max_k = i
@@ -193,7 +193,7 @@ if a_list!=[]:
     max_val_2 = 0
     max_k = 0
     max_k_2 = 0
-    for i in range (1, len(change)-3):
+    for i in range (2, len(change)-2):
         if change[i] > max_val:
             max_val_2, max_k_2 = max_val, max_k
             max_val = change[i]
