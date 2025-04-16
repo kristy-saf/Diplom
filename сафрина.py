@@ -61,7 +61,7 @@ if a_list!=[]:
         st.write('уравнение: y_t =', x_mnk[0], '+', x_mnk[1], '*t')
         st.write('по Чебышеву:   а_0 =', x_cheb[0], ', а_1 =', x_cheb[1])
         st.write('уравнение: y_t =', x_cheb[0], '+', x_cheb[1], '*t')
-        st.write('Реальные и прогнозные значения')
+        st.write('Реальные и прогнозные значения для первой части')
         a_1 = st.data_editor(a_df, disabled=['Номер', 'Реальное значение', 'Прогноз по МНК', 'Прогноз по Чебышеву', 'Разница по МНК', 'Разница по Чебышеву'],
                              hide_index=True, column_config = {
                                             "Реальное значение": st.column_config.TextColumn(),
@@ -90,8 +90,8 @@ if a_list!=[]:
         if change[i] > max_val:
             max_val = change[i]
             max_k = i
-    number=max_k+1
-    a_1=a_list[:number-1]
+    number = max_k+1
+    a_1=a_list[:number]
     a_2=a_list[number:]
     def const(x):
         return x[0] + x[1]*(number) - a_list[number-1]
@@ -318,7 +318,7 @@ if a_list!=[]:
                                             "Прогноз по Чебышеву": st.column_config.TextColumn(),
                                             "Разница по МНК": st.column_config.TextColumn(),
                                             "Разница по Чебышеву": st.column_config.TextColumn(),
-                                            })
+                                            }, key='a_1')
         
         st.write('Реальные и прогнозные значения для второй части')
         a_2 = st.data_editor(a_df_2, disabled=['Номер', 'Реальное значение', 'Прогноз по МНК', 'Прогноз по Чебышеву', 'Разница по МНК', 'Разница по Чебышеву'],
@@ -328,7 +328,7 @@ if a_list!=[]:
                                             "Прогноз по Чебышеву": st.column_config.TextColumn(),
                                             "Разница по МНК": st.column_config.TextColumn(),
                                             "Разница по Чебышеву": st.column_config.TextColumn(),
-                                            })
+                                            }, key='a_2')
         st.write('Реальные и прогнозные значения для третьей части')
         a_3 = st.data_editor(a_df_3, disabled=['Номер', 'Реальное значение', 'Прогноз по МНК', 'Прогноз по Чебышеву', 'Разница по МНК', 'Разница по Чебышеву'],
                              hide_index=True, column_config = {
@@ -351,7 +351,7 @@ if a_list!=[]:
 
 
 
-    r2_mnk_best, r2_cheb_best = 0, 0
+    r2_mnk_best, r2_cheb_best = -10000000, -10000000
     x_1_mnk_best, x_2_mnk_best, x_1_cheb_best, x_2_cheb_best = [], [], [], []
     df_res_mnk_best, df_res_cheb_best = pd.DataFrame(), pd.DataFrame()
     for number in range (2, len(change)-2):
